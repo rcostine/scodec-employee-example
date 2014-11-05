@@ -1,32 +1,43 @@
 package com.zekelogix.scodec.codecs
 
+import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+import java.util.Date
+
+import com.zekelogix.scodec.CodecSuite
+
 import scalaz.\/
-import scodec.bits.{ BitVector, ByteVector }
-import scodec.codecs._
-import scodec.Err
 
 class EmployeeCodecTest extends CodecSuite {
 
-  "ascii codec" should {
+  val testCharset = Charset.forName("US-ASCII")
+  val dateFormat = new SimpleDateFormat("yyyy/MM/dd")
+
+  "employee codec" should {
     "roundtrip" in {
-      roundtripAll(ascii, Seq("test", "", "with\ttabs"))
-    }
-  }
-
-  "utf8 codec" should {
-    "roundtrip" in {
-      roundtripAll(utf8, Seq("test", "", "with\ttabs", "withλ"))
-    }
-  }
-
-  "string codecs" should {
-    "fail encoding with an error when string to encode contains chars unsupported by charset" in {
-      ascii.encode("λ") shouldBe \/.left(Err("US-ASCII cannot encode character 'λ'"))
-      ascii.encode("Includes a λ") shouldBe \/.left(Err("US-ASCII cannot encode character 'λ'"))
-    }
-
-    "fail decoding with an error when buffer contains bytes unsupported by charset" in {
-      utf8.decode(BitVector(ByteVector.fromValidHex("0xf4ffffff"))) shouldBe \/.left(Err("UTF-8 cannot decode string from '0xf4ffffff'"))
+      roundtripAll(
+        employee(testCharset),
+        Seq(
+          Employee(
+            firstName = "Richard",
+            middleInitial = Some('J'),
+            lastName = "Costine",
+            dateOfBirth =  dateFormat.parse("1960/05/24"),
+            startDate = new Date (System.currentTimeMillis()),
+            terminationDate = None,
+            rank = 1
+          ),
+          Employee(
+            firstName = "Chuck",
+            middleInitial = None,
+            lastName = "Catenstein",
+            dateOfBirth =  dateFormat.parse("1997/06/30"),
+            startDate = new Date (System.currentTimeMillis()),
+            terminationDate = None,
+            rank = 1
+          )
+        )
+      )
     }
   }
 }

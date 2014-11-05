@@ -20,10 +20,11 @@ abstract class CodecSuite extends WordSpec with Matchers with GeneratorDrivenPro
   }
 
   protected def roundtrip[A](codec: Codec[A], a: A) {
-    Console.print(s"testing: $a")
+    Console.println(s"testing: $a")
     val encoded = codec.encode(a)
     encoded should be ('right)
     val \/-((remainder, decoded)) = codec.decode(encoded.toOption.get)
+    Console.println(s"tested: $decoded")
     remainder shouldEqual BitVector.empty
     decoded shouldEqual a
   }
