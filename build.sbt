@@ -17,6 +17,7 @@ crossScalaVersions := Seq(scalaVersion.value, "2.11.0")
 scalacOptions ++= Seq(
   "-feature",
   "-deprecation",
+  "-language:implicitConversions",
   "-unchecked",
   "-optimise",
   "-Xcheckinit",
